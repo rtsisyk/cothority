@@ -20,8 +20,11 @@ var CoinName = iid("byzCoin")
 
 // ContractCoin is a coin implementation that holds one instance per coin.
 // If you spawn a new ContractCoin, it will create an account with a value
-// of 0 coins.
-// The following methods are available:
+// of 0 coins. For spawn, an optional argument is 'public' which, if set,
+// is used to create the instanceID of the new coin by calculating
+//  id := sha256("coin" | pKey)
+//
+// The following invoke-methods are available:
 //  - mint will add the number of coins in the argument "coins" to the
 //    current coin instance. The argument must be a 64-bit uint in LittleEndian
 //  - transfer will send the coins given in the argument "coins" to the
@@ -58,6 +61,15 @@ func (c *contractCoin) Spawn(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Instruc
 
 	// Spawn creates a new coin account as a separate instance.
 	ca := inst.DeriveID("")
+	// If 'public' is given as argument, it is used to calculate the new coin
+	// instance ID.
+	if t := inst.Spawn.Args.Search("public"); t != nil {
+		h := sha256.New()
+		h.Write([]byte(ContractCoinID))
+		h.Write(t)
+		ca = byzcoin.NewInstanceID(h.Sum(nil))
+	}
+
 	log.Lvlf3("Spawning coin to %x", ca.Slice())
 	if t := inst.Spawn.Args.Search("type"); t != nil {
 		if len(t) != len(byzcoin.InstanceID{}) {
