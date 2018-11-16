@@ -121,6 +121,10 @@ func (c *contractCoin) Invoke(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Instru
 	case "transfer":
 		// transfer sends a given amount of coins to another account.
 		target := inst.Invoke.Args.Search("destination")
+		if inst.InstanceID.Equal(byzcoin.NewInstanceID(target)) {
+			return nil, nil, errors.New("cannot send to ourselves")
+		}
+
 		var (
 			v   []byte
 			cid string
