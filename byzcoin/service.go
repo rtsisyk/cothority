@@ -63,6 +63,8 @@ var ByzCoinID onet.ServiceID
 
 var verifyByzCoin = skipchain.VerifierID(uuid.NewV5(uuid.NamespaceURL, "ByzCoin"))
 
+var allowViewchange = true
+
 func init() {
 	var err error
 	ByzCoinID, err = onet.RegisterNewService(ServiceName, newService)
@@ -1036,8 +1038,10 @@ func (s *Service) updateTrieCallback(sbID skipchain.SkipBlockID) error {
 		}
 
 		// Start viewchange monitor that will fire if we don't get updates in time.
-		s.viewChangeMan.add(s.sendViewChangeReq, s.sendNewView, s.isLeader, string(sb.Hash))
-		s.viewChangeMan.start(s.ServerIdentity().ID, sb.SkipChainID(), initialDur, s.getFaultThreshold(sb.Hash), string(sb.Hash))
+		if allowViewchange {
+			s.viewChangeMan.add(s.sendViewChangeReq, s.sendNewView, s.isLeader, string(sb.Hash))
+			s.viewChangeMan.start(s.ServerIdentity().ID, sb.SkipChainID(), initialDur, s.getFaultThreshold(sb.Hash), string(sb.Hash))
+		}
 		// TODO fault threshold might change
 
 		// Start polling if we're the leader.
@@ -1958,8 +1962,10 @@ func (s *Service) startAllChains() error {
 		if err != nil {
 			return err
 		}
-		s.viewChangeMan.add(s.sendViewChangeReq, s.sendNewView, s.isLeader, string(gen))
-		s.viewChangeMan.start(s.ServerIdentity().ID, gen, initialDur, s.getFaultThreshold(gen), string(gen))
+		if allowViewchange {
+			s.viewChangeMan.add(s.sendViewChangeReq, s.sendNewView, s.isLeader, string(gen))
+			s.viewChangeMan.start(s.ServerIdentity().ID, gen, initialDur, s.getFaultThreshold(gen), string(gen))
+		}
 		// TODO fault threshold might change
 	}
 

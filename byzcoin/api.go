@@ -54,7 +54,7 @@ func NewLedger(msg *CreateGenesisBlock, keep bool) (*Client, *CreateGenesisBlock
 		c = NewClient(nil, msg.Roster)
 	}
 	reply := &CreateGenesisBlockResponse{}
-	if err := c.SendProtobuf(msg.Roster.List[0], msg, reply); err != nil {
+	if err := c.SendProtobuf(msg.Roster.RandomServerIdentity(), msg, reply); err != nil {
 		return nil, nil, err
 	}
 	c.ID = reply.Skipblock.CalculateHash()
@@ -75,7 +75,7 @@ func (c *Client) AddTransaction(tx ClientTransaction) (*AddTxResponse, error) {
 // initialized before calling this method (see NewClientFromConfig).
 func (c *Client) AddTransactionAndWait(tx ClientTransaction, wait int) (*AddTxResponse, error) {
 	reply := &AddTxResponse{}
-	err := c.SendProtobuf(c.Roster.List[0], &AddTxRequest{
+	err := c.SendProtobuf(c.Roster.RandomServerIdentity(), &AddTxRequest{
 		Version:       CurrentVersion,
 		SkipchainID:   c.ID,
 		Transaction:   tx,
@@ -94,7 +94,7 @@ func (c *Client) AddTransactionAndWait(tx ClientTransaction, wait int) (*AddTxRe
 // (see NewClientFromConfig).
 func (c *Client) GetProof(key []byte) (*GetProofResponse, error) {
 	reply := &GetProofResponse{}
-	err := c.SendProtobuf(c.Roster.List[0], &GetProof{
+	err := c.SendProtobuf(c.Roster.RandomServerIdentity(), &GetProof{
 		Version: CurrentVersion,
 		ID:      c.ID,
 		Key:     key,
@@ -109,7 +109,7 @@ func (c *Client) GetProof(key []byte) (*GetProofResponse, error) {
 // execute in the given darc.
 func (c *Client) CheckAuthorization(dID darc.ID, ids ...darc.Identity) ([]darc.Action, error) {
 	reply := &CheckAuthorizationResponse{}
-	err := c.SendProtobuf(c.Roster.List[0], &CheckAuthorization{
+	err := c.SendProtobuf(c.Roster.RandomServerIdentity(), &CheckAuthorization{
 		Version:    CurrentVersion,
 		ByzCoinID:  c.ID,
 		DarcID:     dID,
@@ -256,7 +256,7 @@ func (c *Client) StreamTransactions(handler func(StreamingResponse, error)) erro
 	req := StreamingRequest{
 		ID: c.ID,
 	}
-	conn, err := c.Stream(c.Roster.List[0], &req)
+	conn, err := c.Stream(c.Roster.RandomServerIdentity(), &req)
 	if err != nil {
 		return err
 	}
@@ -281,7 +281,7 @@ func (c *Client) GetSignerCounters(ids ...string) (*GetSignerCountersResponse, e
 		SignerIDs:   ids,
 	}
 	var reply GetSignerCountersResponse
-	err := c.SendProtobuf(c.Roster.List[0], &req, &reply)
+	err := c.SendProtobuf(c.Roster.RandomServerIdentity(), &req, &reply)
 	if err != nil {
 		return nil, err
 	}

@@ -753,6 +753,11 @@ func rosterAdd(c *cli.Context) error {
 	chainConfig.Roster = *old.Concat(pub)
 	log.Lvl2("New roster is:", chainConfig.Roster.List)
 
+	// Do it twice to make sure the new roster is active - there is an issue ;)
+	err = updateConfig(cl, signer, chainConfig)
+	if err != nil {
+		return err
+	}
 	err = updateConfig(cl, signer, chainConfig)
 	if err != nil {
 		return err
@@ -780,6 +785,11 @@ func rosterDel(c *cli.Context) error {
 	chainConfig.Roster = *onet.NewRoster(list)
 	log.Lvl2("New roster is:", chainConfig.Roster.List)
 
+	// Do it twice to make sure the new roster is active - there is an issue ;)
+	err = updateConfig(cl, signer, chainConfig)
+	if err != nil {
+		return err
+	}
 	err = updateConfig(cl, signer, chainConfig)
 	if err != nil {
 		return err
@@ -808,6 +818,11 @@ func rosterLeader(c *cli.Context) error {
 	chainConfig.Roster = *onet.NewRoster(list)
 	log.Lvl2("New roster is:", chainConfig.Roster.List)
 
+	// Do it twice to make sure the new roster is active - there is an issue ;)
+	err = updateConfig(cl, signer, chainConfig)
+	if err != nil {
+		return err
+	}
 	err = updateConfig(cl, signer, chainConfig)
 	if err != nil {
 		return err

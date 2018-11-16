@@ -342,7 +342,6 @@ func (p *FtCosi) startSubProtocol(tree *onet.Tree) (*SubFtCosi, error) {
 		subThreshold = tree.Size() - 1
 	}
 
-	log.Print("subthreshold is:", subThreshold)
 	cosiSubProtocol.Threshold = subThreshold
 
 	err = cosiSubProtocol.Start()
