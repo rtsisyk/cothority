@@ -54,7 +54,7 @@ func NewLedger(msg *CreateGenesisBlock, keep bool) (*Client, *CreateGenesisBlock
 		c = NewClient(nil, msg.Roster)
 	}
 	reply := &CreateGenesisBlockResponse{}
-	if err := c.SendProtobuf(msg.Roster.RandomServerIdentity(), msg, reply); err != nil {
+	if err := c.SendProtobuf(msg.Roster.List[0], msg, reply); err != nil {
 		return nil, nil, err
 	}
 	c.ID = reply.Skipblock.CalculateHash()
@@ -75,7 +75,7 @@ func (c *Client) AddTransaction(tx ClientTransaction) (*AddTxResponse, error) {
 // initialized before calling this method (see NewClientFromConfig).
 func (c *Client) AddTransactionAndWait(tx ClientTransaction, wait int) (*AddTxResponse, error) {
 	reply := &AddTxResponse{}
-	err := c.SendProtobuf(c.Roster.RandomServerIdentity(), &AddTxRequest{
+	err := c.SendProtobuf(c.Roster.List[0], &AddTxRequest{
 		Version:       CurrentVersion,
 		SkipchainID:   c.ID,
 		Transaction:   tx,

@@ -622,7 +622,7 @@ func (s *Service) createNewBlock(scID skipchain.SkipBlockID, r *onet.Roster, tx 
 		// it.
 		sb = skipchain.NewSkipBlock()
 		sb.Roster = r
-		sb.MaximumHeight = 32
+		sb.MaximumHeight = 8
 		sb.BaseHeight = 4
 		// We have to register the verification functions in the genesis block
 		sb.VerifierIDs = []skipchain.VerifierID{skipchain.VerifyBase, verifyByzCoin}

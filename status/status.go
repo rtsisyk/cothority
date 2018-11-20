@@ -29,7 +29,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "group, g",
-			Value: "public.toml",
+			Value: "group.toml",
 			Usage: "Cothority group definition in `FILE.toml`",
 		},
 		cli.StringFlag{
@@ -136,10 +136,10 @@ func readGroup(tomlFileName string) (*onet.Roster, error) {
 // prints the status response that is returned from the server
 func printTxt(e *status.Response) {
 	log.Info("-----------------------------------------------")
-	log.Infof("Address: \"%s\"", e.ServerIdentity.Address)
-	log.Info("Suite: \"Ed25519\"")
-	log.Infof("Public: \"%s\"", e.ServerIdentity.Public)
-	log.Infof("Description: \"%s\"", e.ServerIdentity.Description)
+	log.Infof("Address = \"%s\"", e.ServerIdentity.Address)
+	log.Info("Suite = \"Ed25519\"")
+	log.Infof("Public = \"%s\"", e.ServerIdentity.Public)
+	log.Infof("Description = \"%s\"", e.ServerIdentity.Description)
 	log.Info("-----------------------------------------------")
 	var a []string
 	if e.Status == nil {

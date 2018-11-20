@@ -41,6 +41,12 @@ class Proof {
   get stateChangeBody() {
     return this._stateChangeBody
   }
+
+  get instance(){
+    let inst = this._stateChangeBody
+    inst.data = inst.value;
+    return inst;
+  }
 }
 
 module.exports = Proof;

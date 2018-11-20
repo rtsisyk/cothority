@@ -191,6 +191,7 @@ func verify(fileName, sigFileName, groupToml string) error {
 	sig := &s.SignatureResponse{}
 	sig.Hash, err = hex.DecodeString(sigStr.Hash)
 	sig.Signature, err = hex.DecodeString(sigStr.Signature)
+	log.Info("[+] Reading group file", groupToml)
 	fGroup, err := os.Open(groupToml)
 	if err != nil {
 		return err
