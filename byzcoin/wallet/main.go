@@ -107,7 +107,7 @@ func main() {
 }
 
 func join(c *cli.Context) error {
-	if _, _, err := LoadConfig(); err == nil {
+	if _, _, err := loadConfig(); err == nil {
 		return fmt.Errorf("configuration already exists - please delete %s first",
 			filepath.Join(ConfigPath, configName))
 	}
@@ -125,7 +125,7 @@ func join(c *cli.Context) error {
 		KeyPair:  *key.NewKeyPair(cothority.Suite),
 	}
 
-	err = cfg.Save()
+	err = cfg.save()
 	if err != nil {
 		return err
 	}
@@ -134,7 +134,7 @@ func join(c *cli.Context) error {
 }
 
 func show(c *cli.Context) error {
-	cfg, cl, err := LoadConfig()
+	cfg, cl, err := loadConfig()
 	if err != nil {
 		return err
 	}
@@ -183,7 +183,7 @@ func transfer(c *cli.Context) error {
 	}
 	target, err := coinHash(targetPub)
 
-	cfg, cl, err := LoadConfig()
+	cfg, cl, err := loadConfig()
 	if err != nil {
 		return err
 	}
@@ -246,7 +246,6 @@ func transfer(c *cli.Context) error {
 			},
 		}
 		ctx.SignWith(signer)
-		ctx.InstructionsHash = ctx.Instructions.Hash()
 
 		log.Info("Sending transaction of", amount, "coins to address", c.Args().Get(1))
 		wait := 0
@@ -278,56 +277,59 @@ func coinHash(pub kyber.Point) (iid byzcoin.InstanceID, err error) {
 
 const configName = "wallet.json"
 
-type SIJSON struct {
+// All these structures are used to save/load json files. This is due to the
+// fact that points and scalars are not storable in json. An alternative would
+// be to add `TextMarshaller` to Point, Scalar and the IDs.
+
+type siJSON struct {
 	Public      string
 	ID          string
 	Address     string
 	Description string
 }
 
-type RosterJSON struct {
+type rosterJSON struct {
 	ID        string
-	List      []SIJSON
+	List      []siJSON
 	Aggregate string
 }
 
-type RuleJSON struct {
+type ruleJSON struct {
 	Action     string
 	Expression string
 }
 
-type DarcJSON struct {
+type darcJSON struct {
 	Version     uint64
 	Description string
 	BaseID      string
 	PrevID      string
-	Rules       []RuleJSON
+	Rules       []ruleJSON
 }
 
-type BCConfigJSON struct {
-	Roster        RosterJSON
+type bcconfigJSON struct {
+	Roster        rosterJSON
 	ByzCoinID     string
-	GenesisDarc   DarcJSON
+	GenesisDarc   darcJSON
 	AdminIdentity string
 }
 
-type KeyPairJSON struct {
+type keyPairJSON struct {
 	Public  string
 	Private string
 }
 
-type ConfigJSON struct {
-	ByzcoinConfig BCConfigJSON
-	KeyPair       KeyPairJSON
+type configJSON struct {
+	ByzcoinConfig bcconfigJSON
+	KeyPair       keyPairJSON
 }
 
-// TODO: make json
-func LoadConfig() (cfg Config, cl *byzcoin.Client, err error) {
+func loadConfig() (cfg Config, cl *byzcoin.Client, err error) {
 	buf, err := ioutil.ReadFile(filepath.Join(ConfigPath, configName))
 	if err != nil {
 		return
 	}
-	cfgJSON := ConfigJSON{}
+	cfgJSON := configJSON{}
 	err = json.Unmarshal(buf, &cfgJSON)
 	if err != nil {
 		return
@@ -389,7 +391,7 @@ func LoadConfig() (cfg Config, cl *byzcoin.Client, err error) {
 	return
 }
 
-func (cfg Config) Save() error {
+func (cfg Config) save() error {
 	kpPub, err := encoding.PointToStringHex(cothority.Suite, cfg.KeyPair.Public)
 	if err != nil {
 		return err
@@ -399,12 +401,12 @@ func (cfg Config) Save() error {
 		return err
 	}
 
-	jr := RosterJSON{
+	jr := rosterJSON{
 		ID:        fmt.Sprintf("%x", cfg.BCConfig.Roster.ID[:]),
 		Aggregate: cfg.BCConfig.Roster.Aggregate.String(),
 	}
 	for _, si := range cfg.BCConfig.Roster.List {
-		jr.List = append(jr.List, SIJSON{
+		jr.List = append(jr.List, siJSON{
 			Public:      si.Public.String(),
 			ID:          fmt.Sprintf("%x", si.ID[:]),
 			Address:     string(si.Address),
@@ -412,21 +414,21 @@ func (cfg Config) Save() error {
 		})
 	}
 	d := cfg.BCConfig.GenesisDarc
-	jd := DarcJSON{
+	jd := darcJSON{
 		Version:     d.Version,
 		Description: string(d.Description),
 		BaseID:      fmt.Sprintf("%x", d.BaseID),
 		PrevID:      fmt.Sprintf("%x", d.PrevID),
 	}
 	for _, r := range d.Rules.List {
-		jd.Rules = append(jd.Rules, RuleJSON{
+		jd.Rules = append(jd.Rules, ruleJSON{
 			Action:     string(r.Action),
 			Expression: string(r.Expr),
 		})
 	}
-	cfgJSON := ConfigJSON{
-		KeyPair: KeyPairJSON{kpPub, kpPriv},
-		ByzcoinConfig: BCConfigJSON{
+	cfgJSON := configJSON{
+		KeyPair: keyPairJSON{kpPub, kpPriv},
+		ByzcoinConfig: bcconfigJSON{
 			Roster:        jr,
 			ByzCoinID:     fmt.Sprintf("%x", cfg.BCConfig.ByzCoinID),
 			GenesisDarc:   jd,
