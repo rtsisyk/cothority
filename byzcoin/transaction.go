@@ -101,6 +101,7 @@ func (instr Instruction) Hash() []byte {
 		args = instr.Spawn.Args
 	case InvokeType:
 		h.Write([]byte{1})
+		h.Write([]byte(instr.Invoke.Command))
 		args = instr.Invoke.Args
 	case DeleteType:
 		h.Write([]byte{2})
