@@ -153,7 +153,7 @@ class ByzCoinRPC {
    */
   static checkProof(proof, expectedContract) {
     if (!proof.matches()) {
-      throw "could'nt find darc";
+      throw "it is a proof of absence";
     }
     let contract = Array.from(proof.stateChangeBody.contractID)
       .map(c => String.fromCharCode(c))

@@ -176,6 +176,7 @@ func (s *Service) CreateGenesisBlock(req *CreateGenesisBlock) (
 	if req.Version != CurrentVersion {
 		return nil, fmt.Errorf("version mismatch - got %d but need %d", req.Version, CurrentVersion)
 	}
+	log.Printf("%+v", req)
 	if req.Roster.List == nil {
 		return nil, errors.New("must provide a roster")
 	}
@@ -1289,7 +1290,7 @@ func (s *Service) startPolling(scID skipchain.SkipBlockID) chan bool {
 						" This function should never be called on a skipchain that does not exist.")
 				}
 
-				log.Lvlf2("%s: Starting new block %d for chain %x", s.ServerIdentity(), latest.Index+1, scID)
+				log.Lvlf3("%s: Starting new block %d for chain %x", s.ServerIdentity(), latest.Index+1, scID)
 				tree := bcConfig.Roster.GenerateNaryTree(len(bcConfig.Roster.List))
 
 				proto, err := s.CreateProtocol(collectTxProtocol, tree)
