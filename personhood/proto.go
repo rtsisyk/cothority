@@ -8,14 +8,13 @@ import (
 )
 
 // PROTOSTART
-// type :InstanceID:bytes
-// type :SkipBlockID:bytes
 // type :skipchain.SkipBlockID:bytes
 // type :byzcoin.InstanceID:bytes
 // package personhood;
 //
 // import "darc.proto";
 // import "pop.proto";
+// import "byzcoin.proto";
 //
 // option java_package = "ch.epfl.dedis.lib.proto";
 // option java_outer_classname = "Personhood";
@@ -198,4 +197,26 @@ type TopupMessage struct {
 	MsgID []byte
 	// Amount to coins to put in the message
 	Amount uint64
+}
+
+type CredentialStruct struct {
+	Credentials []Credential
+}
+
+type Credential struct {
+	Name       string
+	Attributes []Attribute
+}
+
+type Attribute struct {
+	Name  string
+	Value []byte
+}
+
+type SpawnerStruct struct {
+	CostDarc       byzcoin.Coin
+	CostCoin       byzcoin.Coin
+	CostCredential byzcoin.Coin
+	CostParty      byzcoin.Coin
+	Beneficiary    byzcoin.InstanceID
 }

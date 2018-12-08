@@ -3,6 +3,7 @@ package personhood;
 
 import "darc.proto";
 import "pop.proto";
+import "byzcoin.proto";
 
 option java_package = "ch.epfl.dedis.lib.proto";
 option java_outer_classname = "Personhood";
@@ -185,4 +186,26 @@ message TopupMessage {
   required bytes msgid = 1;
   // Amount to coins to put in the message
   required uint64 amount = 2;
+}
+
+message CredentialStruct {
+  repeated Credential credentials = 1;
+}
+
+message Credential {
+  required string name = 1;
+  repeated Attribute attributes = 2;
+}
+
+message Attribute {
+  required string name = 1;
+  required bytes value = 2;
+}
+
+message SpawnerStruct {
+  required byzcoin.Coin costdarc = 1;
+  required byzcoin.Coin costcoin = 2;
+  required byzcoin.Coin costcredential = 3;
+  required byzcoin.Coin costparty = 4;
+  required bytes beneficiary = 5;
 }

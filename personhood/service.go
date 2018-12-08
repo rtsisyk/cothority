@@ -272,6 +272,9 @@ func newService(c *onet.Context) (onet.Service, error) {
 		s.TopupQuestionnaire, s.TopupMessage); err != nil {
 		return nil, errors.New("Couldn't register messages")
 	}
+	byzcoin.RegisterContract(c, ContractSpawnerID, contractSpawnerFromBytes)
+	byzcoin.RegisterContract(c, ContractCredentialID, contractCredentialFromBytes)
+
 	if err := s.tryLoad(); err != nil {
 		log.Error(err)
 		return nil, err

@@ -58,7 +58,7 @@ func (c *contractCoin) Spawn(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Instruc
 
 	// Spawn creates a new coin account as a separate instance.
 	ca := inst.DeriveID("")
-	log.Lvlf3("Spawning coin to %x", ca.Slice())
+	log.Lvlf2("Spawning coin to %x", ca.Slice())
 	if t := inst.Spawn.Args.Search("type"); t != nil {
 		if len(t) != len(byzcoin.InstanceID{}) {
 			return nil, nil, errors.New("type needs to be an InstanceID")
