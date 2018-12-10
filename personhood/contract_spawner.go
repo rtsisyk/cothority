@@ -83,9 +83,10 @@ func (c *contractSpawner) Spawn(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Inst
 					cout[i].SafeSub(coin.Value)
 				}
 			}
+			darcID = inst.Spawn.Args.Search("darcID")
 			h := sha256.New()
 			h.Write([]byte("coin"))
-			h.Write(inst.Spawn.Args.Search("pubKey"))
+			h.Write(darcID)
 			ca = byzcoin.NewInstanceID(h.Sum(nil))
 			instBuf, err = protobuf.Encode(coin)
 			if err != nil {

@@ -15933,6 +15933,618 @@ public final class Personhood {
 
   }
 
+  public interface TestStoreOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:personhood.TestStore)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional bytes byzcoinid = 1;</code>
+     */
+    boolean hasByzcoinid();
+    /**
+     * <code>optional bytes byzcoinid = 1;</code>
+     */
+    com.google.protobuf.ByteString getByzcoinid();
+
+    /**
+     * <code>optional bytes spawneriid = 2;</code>
+     */
+    boolean hasSpawneriid();
+    /**
+     * <code>optional bytes spawneriid = 2;</code>
+     */
+    com.google.protobuf.ByteString getSpawneriid();
+  }
+  /**
+   * <pre>
+   * TestStore is used to store test-structures. If it is called
+   * with null pointers, nothing is stored, and only the currently
+   * stored data is returned.
+   * This will not be saved to disk.
+   * </pre>
+   *
+   * Protobuf type {@code personhood.TestStore}
+   */
+  public  static final class TestStore extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:personhood.TestStore)
+      TestStoreOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use TestStore.newBuilder() to construct.
+    private TestStore(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private TestStore() {
+      byzcoinid_ = com.google.protobuf.ByteString.EMPTY;
+      spawneriid_ = com.google.protobuf.ByteString.EMPTY;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private TestStore(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              bitField0_ |= 0x00000001;
+              byzcoinid_ = input.readBytes();
+              break;
+            }
+            case 18: {
+              bitField0_ |= 0x00000002;
+              spawneriid_ = input.readBytes();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return ch.epfl.dedis.lib.proto.Personhood.internal_static_personhood_TestStore_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return ch.epfl.dedis.lib.proto.Personhood.internal_static_personhood_TestStore_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              ch.epfl.dedis.lib.proto.Personhood.TestStore.class, ch.epfl.dedis.lib.proto.Personhood.TestStore.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int BYZCOINID_FIELD_NUMBER = 1;
+    private com.google.protobuf.ByteString byzcoinid_;
+    /**
+     * <code>optional bytes byzcoinid = 1;</code>
+     */
+    public boolean hasByzcoinid() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional bytes byzcoinid = 1;</code>
+     */
+    public com.google.protobuf.ByteString getByzcoinid() {
+      return byzcoinid_;
+    }
+
+    public static final int SPAWNERIID_FIELD_NUMBER = 2;
+    private com.google.protobuf.ByteString spawneriid_;
+    /**
+     * <code>optional bytes spawneriid = 2;</code>
+     */
+    public boolean hasSpawneriid() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional bytes spawneriid = 2;</code>
+     */
+    public com.google.protobuf.ByteString getSpawneriid() {
+      return spawneriid_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, byzcoinid_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(2, spawneriid_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, byzcoinid_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, spawneriid_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof ch.epfl.dedis.lib.proto.Personhood.TestStore)) {
+        return super.equals(obj);
+      }
+      ch.epfl.dedis.lib.proto.Personhood.TestStore other = (ch.epfl.dedis.lib.proto.Personhood.TestStore) obj;
+
+      boolean result = true;
+      result = result && (hasByzcoinid() == other.hasByzcoinid());
+      if (hasByzcoinid()) {
+        result = result && getByzcoinid()
+            .equals(other.getByzcoinid());
+      }
+      result = result && (hasSpawneriid() == other.hasSpawneriid());
+      if (hasSpawneriid()) {
+        result = result && getSpawneriid()
+            .equals(other.getSpawneriid());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasByzcoinid()) {
+        hash = (37 * hash) + BYZCOINID_FIELD_NUMBER;
+        hash = (53 * hash) + getByzcoinid().hashCode();
+      }
+      if (hasSpawneriid()) {
+        hash = (37 * hash) + SPAWNERIID_FIELD_NUMBER;
+        hash = (53 * hash) + getSpawneriid().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(ch.epfl.dedis.lib.proto.Personhood.TestStore prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * TestStore is used to store test-structures. If it is called
+     * with null pointers, nothing is stored, and only the currently
+     * stored data is returned.
+     * This will not be saved to disk.
+     * </pre>
+     *
+     * Protobuf type {@code personhood.TestStore}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:personhood.TestStore)
+        ch.epfl.dedis.lib.proto.Personhood.TestStoreOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return ch.epfl.dedis.lib.proto.Personhood.internal_static_personhood_TestStore_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return ch.epfl.dedis.lib.proto.Personhood.internal_static_personhood_TestStore_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                ch.epfl.dedis.lib.proto.Personhood.TestStore.class, ch.epfl.dedis.lib.proto.Personhood.TestStore.Builder.class);
+      }
+
+      // Construct using ch.epfl.dedis.lib.proto.Personhood.TestStore.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        byzcoinid_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        spawneriid_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return ch.epfl.dedis.lib.proto.Personhood.internal_static_personhood_TestStore_descriptor;
+      }
+
+      @java.lang.Override
+      public ch.epfl.dedis.lib.proto.Personhood.TestStore getDefaultInstanceForType() {
+        return ch.epfl.dedis.lib.proto.Personhood.TestStore.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public ch.epfl.dedis.lib.proto.Personhood.TestStore build() {
+        ch.epfl.dedis.lib.proto.Personhood.TestStore result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public ch.epfl.dedis.lib.proto.Personhood.TestStore buildPartial() {
+        ch.epfl.dedis.lib.proto.Personhood.TestStore result = new ch.epfl.dedis.lib.proto.Personhood.TestStore(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.byzcoinid_ = byzcoinid_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.spawneriid_ = spawneriid_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof ch.epfl.dedis.lib.proto.Personhood.TestStore) {
+          return mergeFrom((ch.epfl.dedis.lib.proto.Personhood.TestStore)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(ch.epfl.dedis.lib.proto.Personhood.TestStore other) {
+        if (other == ch.epfl.dedis.lib.proto.Personhood.TestStore.getDefaultInstance()) return this;
+        if (other.hasByzcoinid()) {
+          setByzcoinid(other.getByzcoinid());
+        }
+        if (other.hasSpawneriid()) {
+          setSpawneriid(other.getSpawneriid());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        ch.epfl.dedis.lib.proto.Personhood.TestStore parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (ch.epfl.dedis.lib.proto.Personhood.TestStore) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private com.google.protobuf.ByteString byzcoinid_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes byzcoinid = 1;</code>
+       */
+      public boolean hasByzcoinid() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional bytes byzcoinid = 1;</code>
+       */
+      public com.google.protobuf.ByteString getByzcoinid() {
+        return byzcoinid_;
+      }
+      /**
+       * <code>optional bytes byzcoinid = 1;</code>
+       */
+      public Builder setByzcoinid(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        byzcoinid_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes byzcoinid = 1;</code>
+       */
+      public Builder clearByzcoinid() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        byzcoinid_ = getDefaultInstance().getByzcoinid();
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString spawneriid_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes spawneriid = 2;</code>
+       */
+      public boolean hasSpawneriid() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional bytes spawneriid = 2;</code>
+       */
+      public com.google.protobuf.ByteString getSpawneriid() {
+        return spawneriid_;
+      }
+      /**
+       * <code>optional bytes spawneriid = 2;</code>
+       */
+      public Builder setSpawneriid(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        spawneriid_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes spawneriid = 2;</code>
+       */
+      public Builder clearSpawneriid() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        spawneriid_ = getDefaultInstance().getSpawneriid();
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:personhood.TestStore)
+    }
+
+    // @@protoc_insertion_point(class_scope:personhood.TestStore)
+    private static final ch.epfl.dedis.lib.proto.Personhood.TestStore DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new ch.epfl.dedis.lib.proto.Personhood.TestStore();
+    }
+
+    public static ch.epfl.dedis.lib.proto.Personhood.TestStore getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<TestStore>
+        PARSER = new com.google.protobuf.AbstractParser<TestStore>() {
+      @java.lang.Override
+      public TestStore parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new TestStore(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<TestStore> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TestStore> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public ch.epfl.dedis.lib.proto.Personhood.TestStore getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface CredentialStructOrBuilder extends
       // @@protoc_insertion_point(interface_extends:personhood.CredentialStruct)
       com.google.protobuf.MessageOrBuilder {
@@ -15962,6 +16574,10 @@ public final class Personhood {
         int index);
   }
   /**
+   * <pre>
+   * CredentialStruct holds a slice of credentials.
+   * </pre>
+   *
    * Protobuf type {@code personhood.CredentialStruct}
    */
   public  static final class CredentialStruct extends
@@ -16245,6 +16861,10 @@ public final class Personhood {
       return builder;
     }
     /**
+     * <pre>
+     * CredentialStruct holds a slice of credentials.
+     * </pre>
+     *
      * Protobuf type {@code personhood.CredentialStruct}
      */
     public static final class Builder extends
@@ -16769,6 +17389,10 @@ public final class Personhood {
         int index);
   }
   /**
+   * <pre>
+   * Credential represents one identity of the user.
+   * </pre>
+   *
    * Protobuf type {@code personhood.Credential}
    */
   public  static final class Credential extends
@@ -17121,6 +17745,10 @@ public final class Personhood {
       return builder;
     }
     /**
+     * <pre>
+     * Credential represents one identity of the user.
+     * </pre>
+     *
      * Protobuf type {@code personhood.Credential}
      */
     public static final class Builder extends
@@ -17722,6 +18350,10 @@ public final class Personhood {
     com.google.protobuf.ByteString getValue();
   }
   /**
+   * <pre>
+   * Attribute stores one specific attribute of a credential.
+   * </pre>
+   *
    * Protobuf type {@code personhood.Attribute}
    */
   public  static final class Attribute extends
@@ -18048,6 +18680,10 @@ public final class Personhood {
       return builder;
     }
     /**
+     * <pre>
+     * Attribute stores one specific attribute of a credential.
+     * </pre>
+     *
      * Protobuf type {@code personhood.Attribute}
      */
     public static final class Builder extends
@@ -18447,6 +19083,11 @@ public final class Personhood {
     com.google.protobuf.ByteString getBeneficiary();
   }
   /**
+   * <pre>
+   * SpawnerStruct holds the data necessary for knowing how much spawning
+   * of a certain contract costs.
+   * </pre>
+   *
    * Protobuf type {@code personhood.SpawnerStruct}
    */
   public  static final class SpawnerStruct extends
@@ -18937,6 +19578,11 @@ public final class Personhood {
       return builder;
     }
     /**
+     * <pre>
+     * SpawnerStruct holds the data necessary for knowing how much spawning
+     * of a certain contract costs.
+     * </pre>
+     *
      * Protobuf type {@code personhood.SpawnerStruct}
      */
     public static final class Builder extends
@@ -19834,6 +20480,11 @@ public final class Personhood {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_personhood_TopupMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_personhood_TestStore_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_personhood_TestStore_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_personhood_CredentialStruct_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -19895,17 +20546,18 @@ public final class Personhood {
       " \002(\014\022\016\n\006reader\030\003 \002(\014\"J\n\020ReadMessageReply" +
       "\022$\n\007message\030\001 \002(\0132\023.personhood.Message\022\020" +
       "\n\010rewarded\030\002 \002(\010\"-\n\014TopupMessage\022\r\n\005msgi" +
-      "d\030\001 \002(\014\022\016\n\006amount\030\002 \002(\004\"?\n\020CredentialStr" +
-      "uct\022+\n\013credentials\030\001 \003(\0132\026.personhood.Cr" +
-      "edential\"E\n\nCredential\022\014\n\004name\030\001 \002(\t\022)\n\n" +
-      "attributes\030\002 \003(\0132\025.personhood.Attribute\"" +
-      "(\n\tAttribute\022\014\n\004name\030\001 \002(\t\022\r\n\005value\030\002 \002(" +
-      "\014\"\257\001\n\rSpawnerStruct\022\037\n\010costdarc\030\001 \002(\0132\r." +
-      "byzcoin.Coin\022\037\n\010costcoin\030\002 \002(\0132\r.byzcoin" +
-      ".Coin\022%\n\016costcredential\030\003 \002(\0132\r.byzcoin." +
-      "Coin\022 \n\tcostparty\030\004 \002(\0132\r.byzcoin.Coin\022\023" +
-      "\n\013beneficiary\030\005 \002(\014B%\n\027ch.epfl.dedis.lib" +
-      ".protoB\nPersonhood"
+      "d\030\001 \002(\014\022\016\n\006amount\030\002 \002(\004\"2\n\tTestStore\022\021\n\t" +
+      "byzcoinid\030\001 \001(\014\022\022\n\nspawneriid\030\002 \001(\014\"?\n\020C" +
+      "redentialStruct\022+\n\013credentials\030\001 \003(\0132\026.p" +
+      "ersonhood.Credential\"E\n\nCredential\022\014\n\004na" +
+      "me\030\001 \002(\t\022)\n\nattributes\030\002 \003(\0132\025.personhoo" +
+      "d.Attribute\"(\n\tAttribute\022\014\n\004name\030\001 \002(\t\022\r" +
+      "\n\005value\030\002 \002(\014\"\257\001\n\rSpawnerStruct\022\037\n\010costd" +
+      "arc\030\001 \002(\0132\r.byzcoin.Coin\022\037\n\010costcoin\030\002 \002" +
+      "(\0132\r.byzcoin.Coin\022%\n\016costcredential\030\003 \002(" +
+      "\0132\r.byzcoin.Coin\022 \n\tcostparty\030\004 \002(\0132\r.by" +
+      "zcoin.Coin\022\023\n\013beneficiary\030\005 \002(\014B%\n\027ch.ep" +
+      "fl.dedis.lib.protoB\nPersonhood"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20024,26 +20676,32 @@ public final class Personhood {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_personhood_TopupMessage_descriptor,
         new java.lang.String[] { "Msgid", "Amount", });
-    internal_static_personhood_CredentialStruct_descriptor =
+    internal_static_personhood_TestStore_descriptor =
       getDescriptor().getMessageTypes().get(17);
+    internal_static_personhood_TestStore_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_personhood_TestStore_descriptor,
+        new java.lang.String[] { "Byzcoinid", "Spawneriid", });
+    internal_static_personhood_CredentialStruct_descriptor =
+      getDescriptor().getMessageTypes().get(18);
     internal_static_personhood_CredentialStruct_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_personhood_CredentialStruct_descriptor,
         new java.lang.String[] { "Credentials", });
     internal_static_personhood_Credential_descriptor =
-      getDescriptor().getMessageTypes().get(18);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_personhood_Credential_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_personhood_Credential_descriptor,
         new java.lang.String[] { "Name", "Attributes", });
     internal_static_personhood_Attribute_descriptor =
-      getDescriptor().getMessageTypes().get(19);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_personhood_Attribute_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_personhood_Attribute_descriptor,
         new java.lang.String[] { "Name", "Value", });
     internal_static_personhood_SpawnerStruct_descriptor =
-      getDescriptor().getMessageTypes().get(20);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_personhood_SpawnerStruct_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_personhood_SpawnerStruct_descriptor,

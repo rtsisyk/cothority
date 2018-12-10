@@ -199,20 +199,34 @@ type TopupMessage struct {
 	Amount uint64
 }
 
+// TestStore is used to store test-structures. If it is called
+// with null pointers, nothing is stored, and only the currently
+// stored data is returned.
+// This will not be saved to disk.
+type TestStore struct {
+	ByzCoinID  skipchain.SkipBlockID `protobuf:"opt"`
+	SpawnerIID byzcoin.InstanceID    `protobuf:"opt"`
+}
+
+// CredentialStruct holds a slice of credentials.
 type CredentialStruct struct {
 	Credentials []Credential
 }
 
+// Credential represents one identity of the user.
 type Credential struct {
 	Name       string
 	Attributes []Attribute
 }
 
+// Attribute stores one specific attribute of a credential.
 type Attribute struct {
 	Name  string
 	Value []byte
 }
 
+// SpawnerStruct holds the data necessary for knowing how much spawning
+// of a certain contract costs.
 type SpawnerStruct struct {
 	CostDarc       byzcoin.Coin
 	CostCoin       byzcoin.Coin

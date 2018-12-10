@@ -34,6 +34,8 @@ type Service struct {
 	// are correctly handled.
 	*onet.ServiceProcessor
 
+	ts TestStore
+
 	storage *storage1
 }
 
@@ -263,13 +265,26 @@ func (s *Service) TopupMessage(tm *TopupMessage) (*StringReply, error) {
 	return &StringReply{}, nil
 }
 
+// TestStore allows easier testing of the mobile apps by giving an endpoint
+// where current testing data can be stored.
+func (s *Service) TestStore(ts *TestStore) (*TestStore, error) {
+	if ts.ByzCoinID != nil && len(ts.ByzCoinID) == 32 {
+		log.Lvl1("Storing TestStore")
+		s.ts.ByzCoinID = ts.ByzCoinID
+		s.ts.SpawnerIID = ts.SpawnerIID
+	} else {
+		log.Lvl1("Retrieving TestStore")
+	}
+	return &s.ts, nil
+}
+
 func newService(c *onet.Context) (onet.Service, error) {
 	s := &Service{
 		ServiceProcessor: onet.NewServiceProcessor(c),
 	}
 	if err := s.RegisterHandlers(s.AnswerQuestionnaire, s.LinkPoP, s.ListMessages,
 		s.ListQuestionnaires, s.ReadMessage, s.RegisterQuestionnaire, s.SendMessage,
-		s.TopupQuestionnaire, s.TopupMessage); err != nil {
+		s.TopupQuestionnaire, s.TopupMessage, s.TestStore); err != nil {
 		return nil, errors.New("Couldn't register messages")
 	}
 	byzcoin.RegisterContract(c, ContractSpawnerID, contractSpawnerFromBytes)

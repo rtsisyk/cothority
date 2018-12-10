@@ -188,20 +188,34 @@ message TopupMessage {
   required uint64 amount = 2;
 }
 
+// TestStore is used to store test-structures. If it is called
+// with null pointers, nothing is stored, and only the currently
+// stored data is returned.
+// This will not be saved to disk.
+message TestStore {
+  optional bytes byzcoinid = 1;
+  optional bytes spawneriid = 2;
+}
+
+// CredentialStruct holds a slice of credentials.
 message CredentialStruct {
   repeated Credential credentials = 1;
 }
 
+// Credential represents one identity of the user.
 message Credential {
   required string name = 1;
   repeated Attribute attributes = 2;
 }
 
+// Attribute stores one specific attribute of a credential.
 message Attribute {
   required string name = 1;
   required bytes value = 2;
 }
 
+// SpawnerStruct holds the data necessary for knowing how much spawning
+// of a certain contract costs.
 message SpawnerStruct {
   required byzcoin.Coin costdarc = 1;
   required byzcoin.Coin costcoin = 2;
