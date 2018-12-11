@@ -49,68 +49,65 @@ func (c *contractSpawner) Spawn(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Inst
 	// Spawn creates a new coin account as a separate instance.
 	ca := inst.DeriveID("")
 	var instBuf []byte
-	cID := string(inst.Spawn.Args.Search("contractID"))
-	if inst.Spawn.ContractID == ContractSpawnerID {
-		cID = ContractSpawnerID
+	cID := inst.Spawn.ContractID
+	switch cID {
+	case ContractSpawnerID:
 		c.ParseArgs(inst.Spawn.Args)
 		instBuf, err = protobuf.Encode(&c.SpawnerStruct)
 		if err != nil {
 			return nil, nil, errors.New("couldn't encode SpawnerInstance: " + err.Error())
 		}
-	} else {
-		switch cID {
-		case byzcoin.ContractDarcID:
-			if err = c.getCoins(cout, c.CostDarc); err != nil {
-				return
-			}
-			instBuf = inst.Spawn.Args.Search("darc")
-			d, err := darc.NewFromProtobuf(instBuf)
-			if err != nil {
-				return nil, nil, err
-			}
-			ca = byzcoin.NewInstanceID(d.GetBaseID())
-		case contracts.ContractCoinID:
-			if err = c.getCoins(cout, c.CostCoin); err != nil {
-				return
-			}
-			coin := &byzcoin.Coin{
-				Name: byzcoin.NewInstanceID(inst.Spawn.Args.Search("coinName")),
-			}
-			for i := range cout {
-				if cout[i].Name.Equal(coin.Name) {
-					coin.Value = cout[i].Value
-					log.Lvl2("Adding initial balance:", coin.Value)
-					cout[i].SafeSub(coin.Value)
-				}
-			}
-			darcID = inst.Spawn.Args.Search("darcID")
-			h := sha256.New()
-			h.Write([]byte("coin"))
-			h.Write(darcID)
-			ca = byzcoin.NewInstanceID(h.Sum(nil))
-			instBuf, err = protobuf.Encode(coin)
-			if err != nil {
-				return nil, nil, err
-			}
-		case ContractCredentialID:
-			if err = c.getCoins(cout, c.CostCredential); err != nil {
-				return
-			}
-			instBuf = inst.Spawn.Args.Search("credential")
-			var cred CredentialStruct
-			err = protobuf.Decode(instBuf, &cred)
-			if err != nil {
-				return nil, nil, err
-			}
-			darcID = inst.Spawn.Args.Search("darcID")
-			h := sha256.New()
-			h.Write([]byte("coin"))
-			h.Write(darcID)
-			ca = byzcoin.NewInstanceID(h.Sum(nil))
-		default:
-			log.Print("Unknown contract", cID)
-			return nil, nil, errors.New("don't know how to spawn this type of contract")
+	case byzcoin.ContractDarcID:
+		if err = c.getCoins(cout, c.CostDarc); err != nil {
+			return
 		}
+		instBuf = inst.Spawn.Args.Search("darc")
+		d, err := darc.NewFromProtobuf(instBuf)
+		if err != nil {
+			return nil, nil, err
+		}
+		ca = byzcoin.NewInstanceID(d.GetBaseID())
+	case contracts.ContractCoinID:
+		if err = c.getCoins(cout, c.CostCoin); err != nil {
+			return
+		}
+		coin := &byzcoin.Coin{
+			Name: byzcoin.NewInstanceID(inst.Spawn.Args.Search("coinName")),
+		}
+		for i := range cout {
+			if cout[i].Name.Equal(coin.Name) {
+				coin.Value = cout[i].Value
+				log.Lvl2("Adding initial balance:", coin.Value)
+				cout[i].SafeSub(coin.Value)
+			}
+		}
+		darcID = inst.Spawn.Args.Search("darcID")
+		h := sha256.New()
+		h.Write([]byte("coin"))
+		h.Write(darcID)
+		ca = byzcoin.NewInstanceID(h.Sum(nil))
+		instBuf, err = protobuf.Encode(coin)
+		if err != nil {
+			return nil, nil, err
+		}
+	case ContractCredentialID:
+		if err = c.getCoins(cout, c.CostCredential); err != nil {
+			return
+		}
+		instBuf = inst.Spawn.Args.Search("credential")
+		var cred CredentialStruct
+		err = protobuf.Decode(instBuf, &cred)
+		if err != nil {
+			return nil, nil, err
+		}
+		darcID = inst.Spawn.Args.Search("darcID")
+		h := sha256.New()
+		h.Write([]byte("credential"))
+		h.Write(darcID)
+		ca = byzcoin.NewInstanceID(h.Sum(nil))
+	default:
+		log.Print("Unknown contract", cID)
+		return nil, nil, errors.New("don't know how to spawn this type of contract")
 	}
 	log.Lvlf3("Spawning %s instance to %x", cID, ca.Slice())
 	sc = []byzcoin.StateChange{
