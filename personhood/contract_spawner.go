@@ -92,6 +92,21 @@ func (c *contractSpawner) Spawn(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Inst
 			if err != nil {
 				return nil, nil, err
 			}
+		case ContractCredentialID:
+			if err = c.getCoins(cout, c.CostCredential); err != nil {
+				return
+			}
+			instBuf = inst.Spawn.Args.Search("credential")
+			var cred CredentialStruct
+			err = protobuf.Decode(instBuf, &cred)
+			if err != nil {
+				return nil, nil, err
+			}
+			darcID = inst.Spawn.Args.Search("darcID")
+			h := sha256.New()
+			h.Write([]byte("coin"))
+			h.Write(darcID)
+			ca = byzcoin.NewInstanceID(h.Sum(nil))
 		default:
 			log.Print("Unknown contract", cID)
 			return nil, nil, errors.New("don't know how to spawn this type of contract")
@@ -187,6 +202,7 @@ func (ss *SpawnerStruct) ParseArgs(args byzcoin.Arguments) error {
 				return err
 			}
 		} else {
+			log.Print("Setting cost of", cost.name, "to", cost.cost)
 			cost.cost = &byzcoin.Coin{contracts.CoinName, 100}
 		}
 	}
