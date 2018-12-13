@@ -5,6 +5,8 @@ import (
 	"github.com/dedis/cothority/darc"
 	pop "github.com/dedis/cothority/pop/service"
 	"github.com/dedis/cothority/skipchain"
+	"github.com/dedis/kyber"
+	"github.com/dedis/onet"
 )
 
 // PROTOSTART
@@ -233,4 +235,58 @@ type SpawnerStruct struct {
 	CostCredential byzcoin.Coin
 	CostParty      byzcoin.Coin
 	Beneficiary    byzcoin.InstanceID
+}
+
+// PopPartyInstance is the data that is stored in a pop-party instance.
+type PopPartyInstance struct {
+	// State has one of the following values:
+	// 1: it is a configuration only
+	// 2: it is a finalized pop-party
+	State int
+	// FinalStatement has either only the Desc inside if State == 1, or all fields
+	// set if State == 2.
+	FinalStatement *FinalStatement
+	// Previous is the link to the instanceID of the previous party, it can be
+	// nil for the first party.
+	Previous byzcoin.InstanceID
+	// Next is a link to the instanceID of the next party. It can be
+	// nil if there is no next party.
+	Next byzcoin.InstanceID
+	// Public key of service - can be nil.
+	Service kyber.Point `protobuf:"opt"`
+}
+
+// ShortDesc represents Short Description of Pop party
+// Used in merge configuration
+type ShortDesc struct {
+	Location string
+	Roster   *onet.Roster
+}
+
+// PopDesc holds the name, date and a roster of all involved conodes.
+type PopDesc struct {
+	// Name and purpose of the party.
+	Name string
+	// DateTime of the party. It is in the following format, following UTC:
+	//   YYYY-MM-DD HH:mm
+	DateTime string
+	// Location of the party
+	Location string
+	// Roster of all responsible conodes for that party.
+	Roster *onet.Roster
+	// List of parties to be merged
+	Parties []*ShortDesc
+}
+
+// FinalStatement is the final configuration holding all data necessary
+// for a verifier.
+type FinalStatement struct {
+	// Desc is the description of the pop-party.
+	Desc *PopDesc
+	// Attendees holds a slice of all public keys of the attendees.
+	Attendees []kyber.Point
+	// Signature is created by all conodes responsible for that pop-party
+	Signature []byte
+	// Flag indicates that party was merged
+	Merged bool
 }
