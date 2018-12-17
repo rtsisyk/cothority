@@ -2078,13 +2078,13 @@ func TestService_StateChangeCatchUp(t *testing.T) {
 		return &instr
 	}
 
-	instr := createTx(s.darc.GetBaseID(), uint64(1), 1)
+	instr := createTx(s.darc.GetBaseID(), uint64(1), 5)
 
 	for i := 0; i < n-1; i++ {
 		// add transactions that must be recreated
 		createTx(instr.Hash(), uint64(i+1), 0)
 	}
-	createTx(instr.Hash(), uint64(n), 2)
+	createTx(instr.Hash(), uint64(n), 5)
 
 	// Remove some entries to check it will recreate them
 	err := s.service().stateChangeStorage.db.Update(func(tx *bolt.Tx) error {
