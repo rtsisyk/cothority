@@ -342,6 +342,7 @@ func (s *Service) AddTransaction(req *AddTxRequest) (*AddTxResponse, error) {
 // GetProof searches for a key and returns a proof of the
 // presence or the absence of this key.
 func (s *Service) GetProof(req *GetProof) (resp *GetProofResponse, err error) {
+	log.Print(s.ServerIdentity(), req)
 	s.updateCollectionLock.Lock()
 	defer s.updateCollectionLock.Unlock()
 	if s.catchingUp {
@@ -369,7 +370,7 @@ func (s *Service) GetProof(req *GetProof) (resp *GetProofResponse, err error) {
 	if err = proof.Verify(sb.SkipChainID()); err != nil {
 		return
 	}
-
+	log.Printf("returning response: %s %+v", proof.InclusionProof.Match(req.Key), proof)
 	resp = &GetProofResponse{
 		Version: CurrentVersion,
 		Proof:   *proof,
