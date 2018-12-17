@@ -2,19 +2,16 @@ package personhood
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/dedis/cothority"
 	"github.com/dedis/cothority/byzcoin"
+	"github.com/dedis/cothority/byzcoin/contracts"
 	"github.com/dedis/cothority/darc"
-	"github.com/dedis/onet/log"
 	"github.com/dedis/onet/network"
 	"github.com/dedis/protobuf"
 )
-
-// This file holds the contracts for the pop-party. The following contracts
-// are defined here:
-//   - PopParty - holds the Configuration and later the FinalStatement
-//   - PopCoinAccount - represents an account of popcoins
 
 // ContractPopParty represents a pop-party that holds either a configuration
 // or a final statement.
@@ -37,18 +34,33 @@ func contractPopPartyFromBytes(in []byte) (byzcoin.Contract, error) {
 func (c *contract) Spawn(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Instruction, coins []byzcoin.Coin) (scs []byzcoin.StateChange, cout []byzcoin.Coin, err error) {
 	cout = coins
 
-	// fsBuf := inst.Spawn.Args.Search("FinalStatement")
-	// if fsBuf == nil {
-	// 	return nil, nil, errors.New("need FinalStatement argument")
-	// }
-	// c.State = 1
-	//
-	// var fs FinalStatement
-	// err = protobuf.DecodeWithConstructors(fsBuf, &fs, network.DefaultConstructors(cothority.Suite))
-	// if err != nil {
-	// 	return nil, nil, errors.New("couldn't unmarshal the final statement: " + err.Error())
-	// }
-	// c.FinalStatement = &fs
+	fsBuf := inst.Spawn.Args.Search("finalStatement")
+	if fsBuf == nil {
+		return nil, nil, errors.New("need FinalStatement argument")
+	}
+	darcID := inst.Spawn.Args.Search("darcID")
+	if darcID == nil {
+		return nil, nil, errors.New("no darcID argument")
+	}
+	c.State = 1
+
+	var fs FinalStatement
+	err = protobuf.DecodeWithConstructors(fsBuf, &fs, network.DefaultConstructors(cothority.Suite))
+	if err != nil {
+		return nil, nil, errors.New("couldn't unmarshal the final statement: " + err.Error())
+	}
+	c.FinalStatement = &fs
+
+	value, _, _, _, err := rst.GetValues(darcID)
+	if err != nil {
+		return nil, nil, errors.New("couldn't get darc in charge: " + err.Error())
+	}
+	d, err := darc.NewFromProtobuf(value)
+	if err != nil {
+		return nil, nil, errors.New("couldn't get darc: " + err.Error())
+	}
+	expr := d.Rules.Get("invoke:finalize")
+	c.Organizers = len(strings.Split(string(expr), "|"))
 
 	ppiBuf, err := protobuf.Encode(&c.PopPartyInstance)
 	if err != nil {
@@ -69,86 +81,97 @@ func (c *contract) Invoke(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Instructio
 	if err != nil {
 		return nil, nil, errors.New("couldn't get instance data: " + err.Error())
 	}
-	log.Print(darcID)
 
 	switch inst.Invoke.Command {
-	case "Finalize":
-		// if c.State != 1 {
-		// 	return nil, nil, fmt.Errorf("can only finalize party with state 1, but current state is %d",
-		// 		c.State)
-		// }
-		// fsBuf := inst.Invoke.Args.Search("FinalStatement")
-		// if fsBuf == nil {
-		// 	return nil, nil, errors.New("missing argument: FinalStatement")
-		// }
-		// fs := FinalStatement{}
-		// err = protobuf.DecodeWithConstructors(fsBuf, &fs, network.DefaultConstructors(cothority.Suite))
-		// if err != nil {
-		// 	return nil, nil, errors.New("argument is not a valid FinalStatement")
-		// }
-		//
-		// // TODO: check for aggregate signature of all organizers
-		// ppi := PopPartyInstance{
-		// 	State:          2,
-		// 	FinalStatement: &fs,
-		// }
-		//
-		// for i, pub := range fs.Attendees {
-		// 	log.Lvlf3("Creating darc for attendee %d %s", i, pub)
-		// 	d, sc, err := createDarc(darcID, pub)
-		// 	if err != nil {
-		// 		return nil, nil, err
-		// 	}
-		// 	scs = append(scs, sc)
-		//
-		// 	sc, err = createCoin(inst, d, pub, 1000000)
-		// 	if err != nil {
-		// 		return nil, nil, err
-		// 	}
-		// 	scs = append(scs, sc)
-		// }
-		//
-		// // And add a service if the argument is given
-		// sBuf := inst.Invoke.Args.Search("Service")
-		// if sBuf != nil {
-		// 	ppi.Service = cothority.Suite.Point()
-		// 	err = ppi.Service.UnmarshalBinary(sBuf)
-		// 	if err != nil {
-		// 		return nil, nil, errors.New("couldn't unmarshal point: " + err.Error())
-		// 	}
-		//
-		// 	log.Lvlf3("Checking if service-darc and account for %s should be appended", ppi.Service)
-		// 	d, sc, err := createDarc(darcID, ppi.Service)
-		// 	if err != nil {
-		// 		return nil, nil, err
-		// 	}
-		// 	_, _, _, _, err = rst.GetValues(d.GetBaseID())
-		// 	if err != nil {
-		// 		log.Lvl2("Appending service-darc because it doesn't exist yet")
-		// 		scs = append(scs, sc)
-		// 	}
-		//
-		// 	log.Lvl3("Creating coin account for service")
-		// 	sc, err = createCoin(inst, d, ppi.Service, 0)
-		// 	if err != nil {
-		// 		return nil, nil, err
-		// 	}
-		//
-		// 	scs = append(scs, sc)
-		// }
-		//
-		// ppiBuf, err := protobuf.Encode(&ppi)
-		// if err != nil {
-		// 	return nil, nil, errors.New("couldn't marshal PopPartyInstance: " + err.Error())
-		// }
-		//
-		// // Update existing final statement
-		// scs = append(scs, byzcoin.NewStateChange(byzcoin.Update, inst.InstanceID, ContractPopParty, ppiBuf, darcID))
-		//
-		return scs, coins, nil
-	case "AddParty":
+	case "finalize":
+		if c.State != 1 {
+			return nil, nil, fmt.Errorf("can only finalize party with state 1, but current state is %d",
+				c.State)
+		}
+		if inst.Signatures[0].Signer.Darc == nil {
+			return nil, nil, errors.New("only darc-signers allowed for finalization")
+		}
+
+		attBuf := inst.Invoke.Args.Search("attendees")
+		if attBuf == nil {
+			return nil, nil, errors.New("missing argument: attendees")
+		}
+		var atts Attendees
+		err = protobuf.DecodeWithConstructors(attBuf, &atts, network.DefaultConstructors(cothority.Suite))
+
+		alreadySigned := false
+		orgDarc := inst.Signatures[0].Signer.Darc.ID
+		for _, f := range c.Finalizations {
+			if f.Equal(orgDarc) {
+				alreadySigned = true
+				break
+			}
+		}
+
+		if len(c.Finalizations) == 0 || alreadySigned {
+			// Store first proposition of list of attendees or reset if the same
+			// organizer submits again
+			c.FinalStatement.Attendees = atts
+			c.Finalizations = []darc.ID{orgDarc}
+		} else {
+			// Check if it is the same set of attendees or not
+			same := true
+			for i, att := range c.FinalStatement.Attendees.Keys {
+				if !att.Equal(atts.Keys[i]) {
+					same = false
+				}
+			}
+			if same {
+				c.Finalizations = append(c.Finalizations, orgDarc)
+			} else {
+				c.FinalStatement.Attendees = atts
+				c.Finalizations = []darc.ID{orgDarc}
+			}
+		}
+
+	case "addParty":
 		return nil, nil, errors.New("not yet implemented")
+
+	case "mine":
+		lrs := inst.Invoke.Args.Search("lrs")
+		if lrs == nil {
+			return nil, nil, errors.New("need lrs argument")
+		}
+
+		coinIID := inst.Invoke.Args.Search("coinIID")
+		if coinIID == nil {
+			return nil, nil, errors.New("need coinIID argument")
+		}
+		coinBuf, _, cid, coinDarc, err := rst.GetValues(coinIID)
+		if cid != contracts.ContractCoinID {
+			return nil, nil, errors.New("coinIID is not a coin contract")
+		}
+		var coin byzcoin.Coin
+		err = protobuf.Decode(coinBuf, &coin)
+		if err != nil {
+			return nil, nil, errors.New("couldn't unmarshal coin: " + err.Error())
+		}
+		err = coin.SafeAdd(c.MiningReward)
+		if err != nil {
+			return nil, nil, errors.New("couldn't add mining reward: " + err.Error())
+		}
+		coinBuf, err = protobuf.Encode(coin)
+		scs = append(scs, byzcoin.NewStateChange(byzcoin.Update,
+			byzcoin.NewInstanceID(coinIID),
+			contracts.ContractCoinID, coinBuf, coinDarc))
+
 	default:
-		return nil, nil, errors.New("can only finalize Pop-party contract")
+		return nil, nil, errors.New("unknown command")
 	}
+
+	// Storing new version of PopPartyInstance
+	ppiBuf, err := protobuf.Encode(&c.PopPartyInstance)
+	if err != nil {
+		return nil, nil, errors.New("couldn't marshal PopPartyInstance: " + err.Error())
+	}
+
+	// Update existing final statement
+	scs = append(scs, byzcoin.NewStateChange(byzcoin.Update, inst.InstanceID, ContractPopParty, ppiBuf, darcID))
+
+	return scs, coins, nil
 }

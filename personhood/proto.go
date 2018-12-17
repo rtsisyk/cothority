@@ -3,7 +3,6 @@ package personhood
 import (
 	"github.com/dedis/cothority/byzcoin"
 	"github.com/dedis/cothority/darc"
-	pop "github.com/dedis/cothority/pop/service"
 	"github.com/dedis/cothority/skipchain"
 	"github.com/dedis/kyber"
 	"github.com/dedis/onet"
@@ -15,7 +14,6 @@ import (
 // package personhood;
 //
 // import "darc.proto";
-// import "pop.proto";
 // import "byzcoin.proto";
 //
 // option java_package = "ch.epfl.dedis.lib.proto";
@@ -34,7 +32,7 @@ type Party struct {
 	// InstanceID is where to find the party in the ledger.
 	InstanceID byzcoin.InstanceID
 	// FinalStatement describes the party and the signature of the organizers.
-	FinalStatement pop.FinalStatement
+	FinalStatement FinalStatement
 	// Darc being responsible for the PartyInstance.
 	Darc darc.Darc
 	// Signer can call Invoke on the PartyInstance.
@@ -243,24 +241,25 @@ type PopPartyInstance struct {
 	// 1: it is a configuration only
 	// 2: it is a finalized pop-party
 	State int
+	// Organizers is the number of organizers responsible for this party
+	Organizers int
+	// Finalizations is a slice of organizer-darcIDs who agree on the list of
+	// public keys in the FinalStatement.
+	Finalizations []darc.ID
 	// FinalStatement has either only the Desc inside if State == 1, or all fields
 	// set if State == 2.
 	FinalStatement *FinalStatement
+	// Miners holds all tags of the linkable ring signatures that already
+	// mined this party.
+	Miners []LRSTag
+	// How much money to mine
+	MiningReward uint64
 	// Previous is the link to the instanceID of the previous party, it can be
 	// nil for the first party.
 	Previous byzcoin.InstanceID
 	// Next is a link to the instanceID of the next party. It can be
 	// nil if there is no next party.
 	Next byzcoin.InstanceID
-	// Public key of service - can be nil.
-	Service kyber.Point `protobuf:"opt"`
-}
-
-// ShortDesc represents Short Description of Pop party
-// Used in merge configuration
-type ShortDesc struct {
-	Location string
-	Roster   *onet.Roster
 }
 
 // PopDesc holds the name, date and a roster of all involved conodes.
@@ -274,8 +273,6 @@ type PopDesc struct {
 	Location string
 	// Roster of all responsible conodes for that party.
 	Roster *onet.Roster
-	// List of parties to be merged
-	Parties []*ShortDesc
 }
 
 // FinalStatement is the final configuration holding all data necessary
@@ -284,9 +281,15 @@ type FinalStatement struct {
 	// Desc is the description of the pop-party.
 	Desc *PopDesc
 	// Attendees holds a slice of all public keys of the attendees.
-	Attendees []kyber.Point
-	// Signature is created by all conodes responsible for that pop-party
-	Signature []byte
-	// Flag indicates that party was merged
-	Merged bool
+	Attendees Attendees
+}
+
+// Attendees is a slice of points of attendees' public keys.
+type Attendees struct {
+	Keys []kyber.Point
+}
+
+// LRSTag is the tag of the linkable ring signature sent in by a user.
+type LRSTag struct {
+	Tag []byte
 }

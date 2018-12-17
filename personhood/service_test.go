@@ -10,10 +10,8 @@ import (
 	"github.com/dedis/cothority/byzcoin"
 	"github.com/dedis/cothority/byzcoin/contracts"
 	"github.com/dedis/cothority/darc"
-	pop "github.com/dedis/cothority/pop/service"
 	"github.com/dedis/cothority/skipchain"
 	"github.com/dedis/kyber"
-	"github.com/dedis/kyber/sign/schnorr"
 	"github.com/dedis/kyber/suites"
 	"github.com/dedis/kyber/util/key"
 	"github.com/dedis/kyber/util/random"
@@ -278,8 +276,7 @@ type sStruct struct {
 	roster    *onet.Roster
 	services  []onet.Service
 	phs       []*Service
-	pops      []*pop.Service
-	party     pop.FinalStatement
+	party     FinalStatement
 	orgs      []*key.Pair
 	attendees []*key.Pair
 	attCoin   []byzcoin.InstanceID
@@ -305,10 +302,6 @@ func newS(t *testing.T) (s *sStruct) {
 	for _, p := range s.services {
 		s.phs = append(s.phs, p.(*Service))
 	}
-	popsS := s.local.GetServices(s.servers, onet.ServiceFactory.ServiceID(pop.Name))
-	for _, p := range popsS {
-		s.pops = append(s.pops, p.(*pop.Service))
-	}
 
 	// Create the ledger
 	s.ols = s.local.Services[s.roster.List[0].ID][onet.ServiceFactory.ServiceID(byzcoin.ServiceName)].(*byzcoin.Service)
@@ -332,19 +325,15 @@ func (s *sStruct) Close() {
 // Create a party with orgs organizers and attendees. It will store the party
 // in the ledger and finalize it.
 func (s *sStruct) createParty(t *testing.T, orgs, attendees int) {
-	if orgs > len(s.pops) {
-		t.Fatal("cannot have more organizers than conodes")
-	}
 	for i := 0; i < orgs; i++ {
 		org := key.NewKeyPair(tSuite)
 		s.orgs = append(s.orgs, org)
-		s.pops[i].StoreLink(org.Public)
 	}
 	for i := 0; i < attendees; i++ {
 		s.attendees = append(s.attendees, key.NewKeyPair(tSuite))
 	}
-	s.party = pop.FinalStatement{
-		Desc: &pop.PopDesc{
+	s.party = FinalStatement{
+		Desc: &PopDesc{
 			Name:     "test-party",
 			DateTime: "2018-08-28 08:08",
 			Location: "BC208",
@@ -358,38 +347,38 @@ func (s *sStruct) createParty(t *testing.T, orgs, attendees int) {
 	for _, att := range s.attendees {
 		atts = append(atts, att.Public)
 	}
-	ph := s.party.Desc.Hash()
-	for i, org := range s.orgs {
-		sg, err := schnorr.Sign(tSuite, org.Private, ph)
-		require.Nil(t, err)
-		_, err = s.pops[i].StoreConfig(&pop.StoreConfig{
-			Desc:      s.party.Desc,
-			Signature: sg,
-		})
-		require.Nil(t, err)
-	}
+	// ph := s.party.Desc.Hash()
+	// for i, org := range s.orgs {
+	// 	sg, err := schnorr.Sign(tSuite, org.Private, ph)
+	// 	require.Nil(t, err)
+	// 	_, err = s.pops[i].StoreConfig(&pop.StoreConfig{
+	// 		Desc:      s.party.Desc,
+	// 		Signature: sg,
+	// 	})
+	// 	require.Nil(t, err)
+	// }
 
 	// Store the party in the ledger
 	s.createPoPSpawn(t)
 
 	// Finalise the party
 	log.Lvl2("Finalizing the party in the pop-service")
-	for i, org := range s.orgs {
-		req := &pop.FinalizeRequest{
-			DescID:    ph,
-			Attendees: atts,
-		}
-		reqH, err := req.Hash()
-		require.Nil(t, err)
-		req.Signature, err = schnorr.Sign(tSuite, org.Private, reqH)
-		require.Nil(t, err)
-		fr, err := s.pops[i].FinalizeRequest(req)
-		if err != nil && i == len(s.orgs)-1 {
-			t.Fatal("Shouldn't get error in last finalization-request: " + err.Error())
-		} else if err == nil {
-			s.party = *fr.Final
-		}
-	}
+	// for i, org := range s.orgs {
+	// 	req := &FinalizeRequest{
+	// 		DescID:    ph,
+	// 		Attendees: atts,
+	// 	}
+	// 	reqH, err := req.Hash()
+	// 	require.Nil(t, err)
+	// 	req.Signature, err = schnorr.Sign(tSuite, org.Private, reqH)
+	// 	require.Nil(t, err)
+	// 	fr, err := s.pops[i].FinalizeRequest(req)
+	// 	if err != nil && i == len(s.orgs)-1 {
+	// 		t.Fatal("Shouldn't get error in last finalization-request: " + err.Error())
+	// 	} else if err == nil {
+	// 		s.party = *fr.Final
+	// 	}
+	// }
 
 	// Store the finalized party in the ledger
 	s.invokePoPFinalize(t)
@@ -423,7 +412,7 @@ func (s *sStruct) createPoPSpawn(t *testing.T) {
 		Instructions: byzcoin.Instructions{byzcoin.Instruction{
 			InstanceID: byzcoin.NewInstanceID(dID),
 			Spawn: &byzcoin.Spawn{
-				ContractID: pop.ContractPopParty,
+				ContractID: ContractPopParty,
 				Args: byzcoin.Arguments{{
 					Name:  "FinalStatement",
 					Value: fsBuf,

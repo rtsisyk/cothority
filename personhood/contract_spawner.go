@@ -76,9 +76,15 @@ func (c *contractSpawner) Spawn(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Inst
 		}
 		for i := range cout {
 			if cout[i].Name.Equal(coin.Name) {
-				coin.Value = cout[i].Value
+				err = coin.SafeAdd(cout[i].Value)
+				if err != nil {
+					return nil, nil, err
+				}
 				log.Lvl2("Adding initial balance:", coin.Value)
-				cout[i].SafeSub(coin.Value)
+				err = cout[i].SafeSub(coin.Value)
+				if err != nil {
+					return nil, nil, err
+				}
 			}
 		}
 		darcID = inst.Spawn.Args.Search("darcID")
@@ -105,6 +111,20 @@ func (c *contractSpawner) Spawn(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Inst
 		h.Write([]byte("credential"))
 		h.Write(darcID)
 		ca = byzcoin.NewInstanceID(h.Sum(nil))
+	case ContractPopParty:
+		if err = c.getCoins(cout, c.CostParty); err != nil {
+			return
+		}
+		instBuf = inst.Spawn.Args.Search("finalStatement")
+		var fs FinalStatement
+		err = protobuf.Decode(instBuf, &fs)
+		if err != nil {
+			return nil, nil, err
+		}
+		darcID = inst.Spawn.Args.Search("darcID")
+		if darcID == nil {
+			return nil, nil, errors.New("darcID argument is missing")
+		}
 	default:
 		log.Print("Unknown contract", cID)
 		return nil, nil, errors.New("don't know how to spawn this type of contract")
