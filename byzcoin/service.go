@@ -370,7 +370,7 @@ func (s *Service) GetProof(req *GetProof) (resp *GetProofResponse, err error) {
 	if err = proof.Verify(sb.SkipChainID()); err != nil {
 		return
 	}
-	log.Printf("returning response: %s %+v", proof.InclusionProof.Match(req.Key), proof)
+	log.Printf("returning response: %t for key %x", proof.InclusionProof.Match(req.Key), req.Key)
 	resp = &GetProofResponse{
 		Version: CurrentVersion,
 		Proof:   *proof,
@@ -802,7 +802,7 @@ func (s *Service) downloadDB(sb *skipchain.SkipBlock) error {
 				return errors.New("couldn't load state trie: " + err.Error())
 			}
 			if sb.Index != st.GetIndex() {
-				log.Lvl2("Downloading corresponding block")
+				log.Lvl2("Downloading corresponding block for index", st.GetIndex())
 				cl := skipchain.NewClient()
 				// TODO: make sure the downloaded block is correct
 				search, err := cl.GetSingleBlockByIndex(roster, sb.SkipChainID(), st.GetIndex())
