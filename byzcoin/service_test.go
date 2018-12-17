@@ -441,10 +441,6 @@ func TestService_Depending(t *testing.T) {
 	_, _, _, _, err = cdb.GetValues(in1.Hash())
 	require.Error(t, err)
 	require.Equal(t, errKeyNotSet, err)
-
-	for _, node := range s.services{
-		var sb latest
-	}
 }
 
 func TestService_LateBlock(t *testing.T) {

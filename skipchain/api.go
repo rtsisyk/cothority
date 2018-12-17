@@ -219,6 +219,7 @@ func (c *Client) GetUpdateChainLevel(roster *onet.Roster, latest SkipBlockID,
 		for ; i < retries; i++ {
 			// To handle the case where len(perm) < retries.
 			which := i % len(perm)
+			log.Print("Asking node", roster.List[perm[which]], "for blocks")
 			err = c.SendProtobuf(roster.List[perm[which]], &GetUpdateChain{
 				LatestID:  latest,
 				MaxHeight: maxLevel,
