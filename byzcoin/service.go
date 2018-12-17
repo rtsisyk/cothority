@@ -1699,12 +1699,14 @@ func (s *Service) executeInstruction(st ReadOnlyStateTrie, cin []Coin, instr Ins
 		return
 	}
 
+	s.storage.Lock()
 	contractFactory, exists := s.contracts[contractID]
 	if !exists && ConfigInstanceID.Equal(instr.InstanceID) {
 		// Special case: first time call to genesis-configuration must return
 		// correct contract type.
 		contractFactory, exists = s.contracts[ContractConfigID]
 	}
+	s.storage.Unlock()
 
 	// If the leader does not have a verifier for this contract, it drops the
 	// transaction.
@@ -1924,7 +1926,9 @@ func (s *Service) getPrivateKey() kyber.Scalar {
 // registerContract stores the contract in a map and will
 // call it whenever a contract needs to be done.
 func (s *Service) registerContract(contractID string, c ContractFn) error {
+	s.storage.Lock()
 	s.contracts[contractID] = c
+	s.storage.Unlock()
 	return nil
 }
 

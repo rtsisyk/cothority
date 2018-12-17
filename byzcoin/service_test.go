@@ -442,11 +442,9 @@ func TestService_Depending(t *testing.T) {
 	require.Error(t, err)
 	require.Equal(t, errKeyNotSet, err)
 
-	// We need to wait a bit for the propagation to finish because the
-	// skipchain service might decide to update forward links by adding
-	// additional blocks. How do we make sure that the test closes only
-	// after the forward links are all updated?
-	time.Sleep(time.Second)
+	for _, node := range s.services{
+		var sb latest
+	}
 }
 
 func TestService_LateBlock(t *testing.T) {
