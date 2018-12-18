@@ -374,7 +374,8 @@ func (s *Service) StoreSkipBlock(psbd *StoreSkipBlock) (*StoreSkipBlockReply, er
 func (s *Service) GetUpdateChain(guc *GetUpdateChain) (*GetUpdateChainReply, error) {
 	block := s.db.GetByID(guc.LatestID)
 	if block == nil {
-		return nil, errors.New("Couldn't find latest skipblock")
+		log.Printf("Asked for block %x", guc.LatestID)
+		return nil, errors.New("couldn't find latest skipblock")
 	}
 
 	blocks := []*SkipBlock{block.Copy()}
