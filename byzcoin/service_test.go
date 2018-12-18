@@ -461,12 +461,13 @@ func TestService_LateBlock(t *testing.T) {
 	// Hook the verifier in order delay the arrival and test timestamp checking.
 	ser := s.services[0]
 	c := ser.Context
-	skipchain.RegisterVerification(c, verifyByzCoin, func(newID []byte, newSB *skipchain.SkipBlock) bool {
+	err := skipchain.RegisterVerification(c, verifyByzCoin, func(newID []byte, newSB *skipchain.SkipBlock) bool {
 		// Make this block arrive late compared to it's timestamp. The window will be
 		// 1000ms, so sleep 1200 more, just to be sure.
 		time.Sleep(2200 * time.Millisecond)
 		return ser.verifySkipBlock(newID, newSB)
 	})
+	require.Nil(t, err)
 
 	tx, err := createOneClientTx(s.darc.GetBaseID(), dummyContract, s.value, s.signer)
 	require.Nil(t, err)

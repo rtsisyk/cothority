@@ -269,11 +269,11 @@ func (s *Service) TopupMessage(tm *TopupMessage) (*StringReply, error) {
 // where current testing data can be stored.
 func (s *Service) TestStore(ts *TestStore) (*TestStore, error) {
 	if ts.ByzCoinID != nil && len(ts.ByzCoinID) == 32 {
-		log.Lvl1("Storing TestStore")
+		log.Lvlf1("Storing TestStore %x / %x", ts.ByzCoinID, ts.SpawnerIID)
 		s.ts.ByzCoinID = ts.ByzCoinID
 		s.ts.SpawnerIID = ts.SpawnerIID
 	} else {
-		log.Lvl1("Retrieving TestStore")
+		log.Lvlf1("Retrieving TestStore %x / %x", s.ts.ByzCoinID, s.ts.SpawnerIID)
 	}
 	return &s.ts, nil
 }
