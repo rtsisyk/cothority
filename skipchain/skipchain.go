@@ -1533,6 +1533,10 @@ func (s *Service) startPropagation(propagate messaging.PropagationFunc, ro *onet
 
 // notify other services about new/updated skipblock
 func (s *Service) startGenesisPropagation(genesis *SkipBlock) error {
+	if err := s.incrementWorking(); err != nil{
+		return err
+	}
+	defer s.decrementWorking()
 	roster := genesis.Roster
 	log.Lvlf3("%s: propagating %x to %s", s.ServerIdentity(), genesis.Hash, roster.List)
 

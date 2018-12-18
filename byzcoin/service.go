@@ -342,7 +342,7 @@ func (s *Service) AddTransaction(req *AddTxRequest) (*AddTxResponse, error) {
 // GetProof searches for a key and returns a proof of the
 // presence or the absence of this key.
 func (s *Service) GetProof(req *GetProof) (resp *GetProofResponse, err error) {
-	log.Print(s.ServerIdentity(), req)
+	log.Printf("%s: GetProof for %x / %x", s.ServerIdentity(), req.ID, req.Key)
 	s.updateCollectionLock.Lock()
 	defer s.updateCollectionLock.Unlock()
 	if s.catchingUp {
@@ -1077,8 +1077,9 @@ func (s *Service) updateTrieCallback(sbID skipchain.SkipBlockID) error {
 	if nodeInNew {
 		// Update or start heartbeats
 		if s.heartbeats.exists(string(sb.SkipChainID())) {
-			log.Lvlf2("%s updating heartbeat monitor for %x with window %v", s.ServerIdentity(), sb.SkipChainID(), interval*rotationWindow)
-			s.heartbeats.updateTimeout(string(sb.SkipChainID()), interval*rotationWindow)
+			if s.heartbeats.updateTimeout(string(sb.SkipChainID()), interval*rotationWindow){
+				log.Lvlf2("%s updated heartbeat monitor for %x with window %v", s.ServerIdentity(), sb.SkipChainID(), interval*rotationWindow)
+			}
 		} else {
 			log.Lvlf2("%s starting heartbeat monitor for %x with window %v", s.ServerIdentity(), sb.SkipChainID(), interval*rotationWindow)
 			s.heartbeats.start(string(sb.SkipChainID()), interval*rotationWindow, s.heartbeatsTimeout)

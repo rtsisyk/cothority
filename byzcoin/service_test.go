@@ -193,9 +193,13 @@ func testAddTransaction(t *testing.T, sendToIdx int, failure bool) {
 	for i := 0; i < 2; i++ {
 		if i == 1 {
 			// Now read the key/values from a new service
-			log.Lvl1("Recreate services and fetch keys again")
+			log.Lvl1("Stop/start leader and fetch keys again")
 			s.service().TestClose()
+			log.Print("leader stopped")
+			time.Sleep(time.Second)
+			log.Print("leader starting")
 			require.NoError(t, s.service().startAllChains())
+			log.Print("leader started again")
 		}
 		for _, tx := range txs {
 			pr := s.waitProofWithIdx(t, tx.Instructions[0].Hash(), 0)
