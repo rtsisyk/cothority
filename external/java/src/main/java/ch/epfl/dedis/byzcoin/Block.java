@@ -121,8 +121,8 @@ public class Block {
         return dataBody.getTxResults();
     }
 
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
+    @Override
+    public boolean equals(final Object obj) {
         if (obj == this) {
             return true;
         }

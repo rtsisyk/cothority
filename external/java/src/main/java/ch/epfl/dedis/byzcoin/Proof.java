@@ -11,6 +11,11 @@ import ch.epfl.dedis.lib.proto.ByzCoinProto;
 import ch.epfl.dedis.lib.proto.SkipchainProto;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -93,6 +98,101 @@ public class Proof {
     public boolean matches() {
         // TODO make more verification
         return proof.getLeaf().hasKey() && !proof.getLeaf().getKey().isEmpty();
+    }
+
+    public boolean exists(byte[] key) throws CothorityCryptoException {
+        if (key == null) {
+            throw new CothorityCryptoException("key is nil");
+        }
+
+        if (this.proof.getInteriorsCount() == 0) {
+            throw new CothorityCryptoException("no interior nodes");
+        }
+
+        Boolean[] bits = binSlice(key);
+        byte[] expectedHash = hashInterior(this.proof.getInteriors(0));
+
+        int i;
+        for (i = 0; i < this.proof.getInteriorsCount(); i++) {
+            if (!Arrays.equals(hashInterior(this.proof.getInteriors(i)), expectedHash)) {
+                return false;
+            }
+            if (bits[i]) {
+                expectedHash = this.proof.getInteriors(i).getLeft().toByteArray();
+            } else {
+                expectedHash = this.proof.getInteriors(i).getRight().toByteArray();
+            }
+        }
+        if (Arrays.equals(expectedHash, hashLeaf(this.proof.getLeaf(), this.proof.getNonce().toByteArray()))) {
+            if (!Arrays.equals(Arrays.copyOfRange(bits, 0, i+1), this.proof.getLeaf().getPrefixList().toArray())) {
+                throw new CothorityCryptoException("invalid prefix in leaf node");
+            }
+            if (!Arrays.equals(this.proof.getLeaf().getKey().toByteArray(), key)) {
+                return false;
+            }
+            return true;
+        } else if (Arrays.equals(expectedHash, hashEmpty(this.proof.getEmpty(), this.proof.getNonce().toByteArray()))) {
+            if (!Arrays.equals(Arrays.copyOfRange(bits, 0, i+1), this.proof.getEmpty().getPrefixList().toArray())) {
+                throw new CothorityCryptoException("invalid prefix in empty node");
+            }
+            return false;
+        }
+        return false;
+    }
+
+    private static Boolean[] binSlice(byte[] buf) {
+        Boolean[] bits = new Boolean[buf.length*8];
+        for (int i = 0; i < bits.length; i++) {
+            bits[i] = ((buf[i/8]<<(i%8))&(1<<7)) > 0;
+        }
+        return bits;
+    }
+
+    private static byte[] toByteSlice(List<Boolean> bits) {
+        byte[] buf = new byte[(bits.size()+7)/8];
+        for (int i = 0; i < bits.size(); i++) {
+            if (bits.get(i)) {
+                buf[i/8] |= (1 << 7) >> i%8;
+            }
+        }
+        return buf;
+    }
+
+    private static byte[] hashInterior(TrieProto.InteriorNode interior) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.digest(interior.getLeft().toByteArray());
+            digest.digest(interior.getRight().toByteArray());
+            return digest.digest();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static byte[] hashLeaf(TrieProto.LeafNode leaf, byte[] nonce) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.digest(new byte[]{3}); // typeLeaf
+            digest.digest(nonce);
+            return digest.digest();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static byte[] hashEmpty(TrieProto.EmptyNode empty, byte[] nonce) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.digest(new byte[]{2}); // typeLeaf
+            digest.digest(nonce);
+            digest.digest(toByteSlice(empty.getPrefixList()));
+
+            byte[] lBuf = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(empty.getPrefixCount()).array();
+            digest.digest(lBuf);
+            return digest.digest();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
