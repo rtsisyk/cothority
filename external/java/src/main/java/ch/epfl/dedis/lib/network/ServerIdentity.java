@@ -69,6 +69,15 @@ public class ServerIdentity {
         return pubkey;
     }
 
+    public Point getServicePublic(String serviceName) {
+        for (ServiceIdentity si : this.serviceIdentities) {
+            if (si.getName().equals(serviceName)) {
+                return si.getPublic();
+            }
+        }
+        return null;
+    }
+
     public List<ServiceIdentity> getServiceIdentities() {
         return serviceIdentities;
     }

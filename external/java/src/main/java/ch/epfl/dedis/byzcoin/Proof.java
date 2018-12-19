@@ -2,21 +2,29 @@ package ch.epfl.dedis.byzcoin;
 
 import ch.epfl.dedis.lib.SkipBlock;
 import ch.epfl.dedis.lib.SkipblockId;
+import ch.epfl.dedis.lib.crypto.Bn256G2Point;
+import ch.epfl.dedis.lib.crypto.PointFactory;
 import ch.epfl.dedis.lib.darc.DarcId;
 import ch.epfl.dedis.lib.exception.CothorityCryptoException;
 import ch.epfl.dedis.lib.exception.CothorityException;
 import ch.epfl.dedis.lib.exception.CothorityNotFoundException;
+import ch.epfl.dedis.lib.network.ServerIdentity;
+import ch.epfl.dedis.lib.proto.NetworkProto;
 import ch.epfl.dedis.lib.proto.TrieProto;
 import ch.epfl.dedis.lib.proto.ByzCoinProto;
 import ch.epfl.dedis.lib.proto.SkipchainProto;
+import ch.epfl.dedis.skipchain.ForwardLink;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Proof represents a key/value entry in the trie and the path to the
@@ -79,16 +87,59 @@ public class Proof {
      * leaf. At the end it will verify against the root hash to make sure
      * that the inclusion proof is correct.
      *
-     * @param id the skipblock to verify
-     * @return true if all checks verify, false if there is a mismatch in the hashes
-     * @throws CothorityException if something goes wrong
+     * @param scID the skipblock to verify
+     * @throws CothorityCryptoException if something goes wrong
      */
-    public boolean verify(SkipblockId id) throws CothorityException {
-        if (!isByzCoinProof()){
-            return false;
+    public void verify(SkipblockId scID) throws CothorityCryptoException {
+        ByzCoinProto.DataHeader header;
+        try {
+            header = ByzCoinProto.DataHeader.parseFrom(this.latest.getData());
+        } catch (InvalidProtocolBufferException e) {
+            throw new CothorityCryptoException(e.getMessage());
         }
-        // TODO: more verifications
-        return true;
+        if (!Arrays.equals(this.getRoot(), header.getTrieroot().toByteArray())) {
+            throw new CothorityCryptoException("root of trie is not in skipblock");
+        }
+
+        SkipblockId sbID = null;
+        List<Bn256G2Point> publics = null;
+
+        for (int i = 0; i < this.links.size(); i++) {
+            if (i == 0) {
+                sbID = scID;
+                publics = getPoints(this.links.get(i).getNewRoster().getListList());
+                continue;
+            }
+            ForwardLink fl = new ForwardLink(this.links.get(i));
+            if (!fl.verify(publics)) {
+                throw new CothorityCryptoException("stored skipblock is not properly evolved from genesis block");
+            }
+            if (!Arrays.equals(fl.getFrom().getId(), sbID.getId())) {
+                throw new CothorityCryptoException("stored skipblock is not properly evolved from genesis block");
+            }
+            sbID = fl.getTo();
+            try {
+                if (fl.getNewRoster() != null) {
+                    publics = getPoints(this.links.get(i).getNewRoster().getListList());
+                }
+            } catch (URISyntaxException e) {
+                throw new CothorityCryptoException(e.getMessage());
+            }
+        }
+    }
+
+    private static List<Bn256G2Point> getPoints(List<NetworkProto.ServerIdentity> protos) throws CothorityCryptoException {
+        List<ServerIdentity> sids = new ArrayList<>();
+        for (NetworkProto.ServerIdentity sid: protos) {
+            try {
+                sids.add(new ServerIdentity(sid));
+            } catch (URISyntaxException e) {
+                throw new CothorityCryptoException(e.getMessage());
+            }
+        }
+        return sids.stream()
+                .map(sid -> (Bn256G2Point)sid.getServicePublic("Skipchain"))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -223,6 +274,13 @@ public class Proof {
         return new String(getValues().getContractID());
     }
 
+    public byte[] getRoot() {
+        if (this.proof.getInteriorsCount() == 0) {
+            return null;
+        }
+        return hashInterior(this.proof.getInteriors(0));
+    }
+
     /**
      * @return the darcID defining the access rules to the instance.
      * @throws CothorityCryptoException if there's a problem with the cryptography
@@ -232,23 +290,10 @@ public class Proof {
     }
 
     /**
-     * @return true if this looks like a matching proof for byzcoin.
-     */
-    public boolean isByzCoinProof(){
-        if (!matches()) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * @param expected the string of the expected contract.
      * @return true if this is a matching byzcoin proof for a contract of the given contract.
      */
     public boolean isContract(String expected){
-        if (!isByzCoinProof()){
-            return false;
-        }
         if (!getContractID().equals(expected)) {
             return false;
         }
@@ -264,9 +309,7 @@ public class Proof {
      * @throws CothorityException if something goes wrong
      */
     public boolean isContract(String expected, SkipblockId id) throws CothorityException{
-        if (!verify(id)){
-            return false;
-        }
+        verify(id);
         if (!isContract(expected)){
             return false;
         }

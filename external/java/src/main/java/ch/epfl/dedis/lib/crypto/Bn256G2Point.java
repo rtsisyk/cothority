@@ -3,7 +3,6 @@ package ch.epfl.dedis.lib.crypto;
 import ch.epfl.dedis.lib.Hex;
 import com.google.protobuf.ByteString;
 import ch.epfl.dedis.lib.crypto.bn256.BN;
-import com.google.protobuf.ByteString;
 
 import java.math.BigInteger;
 import java.util.Arrays;

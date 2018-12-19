@@ -1,5 +1,6 @@
 package ch.epfl.dedis.skipchain;
 
+import ch.epfl.dedis.lib.crypto.Bn256G2Point;
 import ch.epfl.dedis.lib.network.Roster;
 import ch.epfl.dedis.lib.SkipblockId;
 import ch.epfl.dedis.lib.exception.CothorityCryptoException;
@@ -8,6 +9,10 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.net.URISyntaxException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A forwardlink represents a signed proof that a future block has been accepted by the set of nodes of
@@ -60,5 +65,28 @@ public class ForwardLink {
      */
     public ByzcoinSig getByzcoinSig(){
         return new ByzcoinSig(forwardLink.getSignature());
+    }
+
+    public boolean verify(List<Bn256G2Point> pubs) {
+        if (!Arrays.equals(this.getByzcoinSig().getMsg(), this.hash())) {
+            return false;
+        }
+        // TODO bls signature verification
+        return false;
+    }
+
+    public byte[] hash() {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.digest(this.forwardLink.getFrom().toByteArray());
+            digest.digest(this.forwardLink.getTo().toByteArray());
+            // TODO correct?
+            if (this.forwardLink.hasNewRoster()) {
+                digest.digest(this.forwardLink.getNewRoster().getId().toByteArray());
+            }
+            return digest.digest();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
