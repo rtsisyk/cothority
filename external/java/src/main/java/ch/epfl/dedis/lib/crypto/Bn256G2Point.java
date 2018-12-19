@@ -2,7 +2,10 @@ package ch.epfl.dedis.lib.crypto;
 
 import ch.epfl.dedis.lib.Hex;
 import com.google.protobuf.ByteString;
+import ch.epfl.dedis.lib.crypto.bn256.BN;
+import com.google.protobuf.ByteString;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
 /**
@@ -11,14 +14,14 @@ import java.util.Arrays;
 public class Bn256G2Point implements Point {
     static final byte[] marshalID = "bn256.pt".getBytes();
 
-    private String hex;
+    private BN.G2 g2;
 
     /**
      * Create a point from the hexadecimal string representation
      * @param pubkey - string of the public key in hexadecimal
      */
     Bn256G2Point(String pubkey) {
-        hex = pubkey.toUpperCase();
+        g2 = new BN.G2().unmarshal(Hex.parseHexBinary(pubkey));
     }
 
     /**
@@ -29,8 +32,11 @@ public class Bn256G2Point implements Point {
         if (Arrays.equals(marshalID, Arrays.copyOfRange(b, 0, 8))) {
             b = Arrays.copyOfRange(b, 8, b.length);
         }
+        g2 = new BN.G2().unmarshal(b);
+    }
 
-        hex = Hex.printHexBinary(b);
+    Bn256G2Point(BN.G2 g2) {
+        this.g2 = g2;
     }
 
     /**
@@ -39,7 +45,7 @@ public class Bn256G2Point implements Point {
      */
     @Override
     public Point copy() {
-        return new Bn256G2Point(hex);
+        return new Bn256G2Point(this.g2.marshal());
     }
 
     /**
@@ -52,8 +58,7 @@ public class Bn256G2Point implements Point {
         if (!(other instanceof Bn256G2Point)) {
             return false;
         }
-
-        return other.toString().equals(toString());
+        return Arrays.equals(((Bn256G2Point)other).toBytes(), this.toBytes());
     }
 
     /**
@@ -63,7 +68,8 @@ public class Bn256G2Point implements Point {
      */
     @Override
     public Point mul(Scalar s) {
-        throw new UnsupportedOperationException();
+        BigInteger k = new BigInteger(1, s.getBigEndian());
+        return new Bn256G2Point(new BN.G2().scalarMul(this.g2, k));
     }
 
     /**
@@ -73,7 +79,10 @@ public class Bn256G2Point implements Point {
      */
     @Override
     public Point add(Point other) {
-        throw new UnsupportedOperationException();
+        if (!(other instanceof Bn256G2Point)) {
+            throw new UnsupportedOperationException();
+        }
+        return new Bn256G2Point(new BN.G2().add(this.g2, ((Bn256G2Point)other).g2));
     }
 
     /**
@@ -84,7 +93,7 @@ public class Bn256G2Point implements Point {
     @Override
     public ByteString toProto() {
         ByteString id = ByteString.copyFrom("bn256.pt".getBytes());
-        return id.concat(ByteString.copyFrom(toBytes()));
+        return id.concat(ByteString.copyFrom(this.toBytes()));
     }
 
     /**
@@ -93,7 +102,7 @@ public class Bn256G2Point implements Point {
      */
     @Override
     public byte[] toBytes() {
-        return Hex.parseHexBinary(hex);
+        return this.g2.marshal();
     }
 
     /**
@@ -102,7 +111,7 @@ public class Bn256G2Point implements Point {
      */
     @Override
     public boolean isZero() {
-        return false;
+        return g2.isInfinity();
     }
 
     /**
@@ -111,12 +120,12 @@ public class Bn256G2Point implements Point {
      */
     @Override
     public Point negate() {
-        throw new UnsupportedOperationException();
+        return new Bn256G2Point(new BN.G2().neg(this.g2));
     }
 
     @Override
     public byte[] data() {
-        throw new UnsupportedOperationException();
+        return this.g2.marshal();
     }
 
     /**
@@ -125,6 +134,6 @@ public class Bn256G2Point implements Point {
      */
     @Override
     public String toString() {
-        return hex;
+        return this.g2.toString();
     }
 }
