@@ -19,6 +19,7 @@ import (
 	"github.com/dedis/onet/cfgpath"
 	"github.com/dedis/onet/log"
 	"github.com/dedis/onet/network"
+
 	"github.com/dedis/cothority/skipchain"
 
 	"encoding/json"
